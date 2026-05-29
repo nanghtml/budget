@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="km" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>កម្មវិធីគ្រប់គ្រងកញ្ចប់ថវិកា</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Kantumruy Pro & Battambang for Khmer support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kantumruy Pro', 'Battambang', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kantumruy Pro', 'Battambang', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-white min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
+
+    <!-- App Container -->
+    <div class="w-full max-w-md mx-auto bg-white dark:bg-black flex flex-col min-h-screen relative pb-20 shadow-2xl border-x border-zinc-200 dark:border-zinc-900">
+        
+        <!-- HEADER -->
+        <header class="px-6 pt-6 pb-2 flex justify-between items-center sticky top-0 bg-white/90 dark:bg-black/90 backdrop-blur-md z-40 border-b border-zinc-100 dark:border-transparent">
+            <div>
+                <h1 id="page-title" class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">ផ្ទាំងគ្រប់គ្រង</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-850 flex items-center justify-center text-amber-500 dark:text-sky-400 transition-colors focus:outline-none" title="ប្តូរពណ៌អេក្រង់">
+                    <i id="theme-icon" class="fa-solid fa-sun text-lg"></i>
+                </button>
+                <!-- Add Transaction Button -->
+                <button onclick="openAddTransactionModal()" class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-850 flex items-center justify-center text-emerald-600 dark:text-sky-400 transition-colors focus:outline-none">
+                    <i class="fa-solid fa-plus text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 px-6 overflow-y-auto no-scrollbar pt-4">
+            
+            <!-- 1. DASHBOARD PAGE -->
+            <section id="page-dashboard" class="space-y-8 py-2">
+                <!-- Budget Overview Section -->
+                <div class="space-y-4">
+                    <h2 class="text-zinc-500 dark:text-zinc-400 text-lg font-medium">ទិដ្ឋភាពទូទៅនៃថវិកា</h2>
+                    
+                    <div class="bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl p-5 flex items-center justify-between">
+                        <!-- Progress Circle -->
+                        <div class="relative w-28 h-28 flex items-center justify-center">
+                            <!-- Background Circle -->
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" class="stroke-zinc-200 dark:stroke-zinc-850" stroke-width="8" fill="transparent" />
+                                <circle id="progress-circle" cx="50" cy="50" r="40" stroke="#10b981" stroke-width="8" fill="transparent" 
+                                    stroke-dasharray="251.2" stroke-dashoffset="226.08" stroke-linecap="round" class="transition-all duration-500" />
+                            </svg>
+                            <span id="progress-text" class="absolute text-xl font-bold text-zinc-900 dark:text-white">0%</span>
+                        </div>
+
+                        <!-- Budget Values -->
+                        <div class="space-y-3 flex-1 pl-6">
+                            <div>
+                                <span class="text-xs text-zinc-500 dark:text-zinc-500 uppercase tracking-wider block">កញ្ចប់ថវិកាសរុប</span>
+                                <div class="flex flex-col">
+                                    <span id="val-total-budget" class="text-xl font-semibold text-zinc-900 dark:text-white">៛ ០</span>
+                                    <span class="text-xs text-zinc-500 dark:text-zinc-400">ក្នុងមួយខែ</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-200 dark:border-zinc-900">
+                                <div>
+                                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider block">ប្រើអស់</span>
+                                    <span id="val-total-spent" class="text-sm font-semibold text-red-500">៛ ០</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider block">នៅសល់</span>
+                                    <span id="val-total-remaining" class="text-sm font-semibold text-emerald-600 dark:text-emerald-500">៛ ០</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✨ AI ADVANCE ADVISOR CARD -->
+                <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-950/20 dark:to-teal-950/20 border border-emerald-500/30 dark:border-emerald-500/20 rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xl">✨</span>
+                        <div>
+                            <h3 class="font-bold text-sm text-emerald-800 dark:text-emerald-400">ទីប្រឹក្សាហិរញ្ញវត្ថុ AI</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">ទទួលបានដំបូន្មានហិរញ្ញវត្ថុឆ្លាតវៃពី AI ស្របតាមចំណាយរបស់អ្នក</p>
+                        </div>
+                    </div>
+                    <button onclick="askAIFeedback()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
+                        <span>✨ វិភាគហិរញ្ញវត្ថុជាមួយ AI</span>
+                    </button>
+                </div>
+
+                <!-- Recent Transactions Section -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-zinc-500 dark:text-zinc-400 text-lg font-medium">ប្រតិបត្តិការថ្មីៗ</h2>
+                        <button onclick="navigate('transactions')" class="text-emerald-600 dark:text-sky-500 text-sm font-medium hover:underline">មើលទាំងអស់</button>
+                    </div>
+                    
+                    <div id="dashboard-recent-list" class="space-y-3">
+                        <!-- Dynamic list generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Spending by Category Preview -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-zinc-500 dark:text-zinc-400 text-lg font-medium">ចំណាយតាមប្រភេទ</h2>
+                        <button onclick="navigate('categories')" class="text-emerald-600 dark:text-sky-500 text-sm font-medium hover:underline">មើលទាំងអស់</button>
+                    </div>
+                    
+                    <div id="dashboard-category-preview" class="space-y-3 bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl p-4">
+                        <!-- Dynamic categories summary generated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. TRANSACTIONS PAGE -->
+            <section id="page-transactions" class="space-y-6 py-2 hidden">
+                <!-- Search Bar -->
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-400 dark:text-zinc-500">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="tx-search" oninput="filterTransactions()" placeholder="ស្វែងរកប្រតិបត្តិការ..." 
+                        class="w-full bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500 transition-colors text-sm">
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <button onclick="filterType('all')" id="chip-all" class="px-4 py-2 rounded-full text-xs font-medium bg-zinc-900 dark:bg-white text-white dark:text-black transition-colors shrink-0">ទាំងអស់</button>
+                    <button onclick="filterType('expense')" id="chip-expense" class="px-4 py-2 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors shrink-0">ចំណាយ</button>
+                    <button onclick="filterType('income')" id="chip-income" class="px-4 py-2 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors shrink-0">ចំណូល</button>
+                </div>
+
+                <!-- Main Transactions List -->
+                <div class="space-y-3" id="main-transactions-list">
+                    <!-- Dynamic transactions generated by JS -->
+                </div>
+            </section>
+
+            <!-- 3. CATEGORIES PAGE -->
+            <section id="page-categories" class="space-y-6 py-2 hidden">
+                <div class="flex flex-col items-center justify-center py-4">
+                    <h3 class="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-4">ចំណាយតាមប្រភេទ</h3>
+                    
+                    <!-- SVG Doughnut Chart -->
+                    <div class="relative w-48 h-48 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100" id="categories-chart-svg">
+                            <!-- Background ring -->
+                            <circle cx="50" cy="50" r="38" class="stroke-zinc-100 dark:stroke-zinc-900" stroke-width="12" fill="transparent" />
+                            <!-- Dynamic segments will be inserted here -->
+                        </svg>
+                        <div class="absolute flex flex-col items-center">
+                            <span class="text-2xl font-bold text-zinc-900 dark:text-white" id="chart-center-spent">៛០</span>
+                            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">ចំណាយសរុប</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Breakdown List -->
+                <div class="space-y-4">
+                    <h4 class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">ប្រភេទទាំងអស់</h4>
+                    <div class="space-y-3" id="categories-detail-list">
+                        <!-- Dynamic content generated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ANALYSIS PAGE -->
+            <section id="page-analysis" class="space-y-6 py-2 hidden">
+                <!-- Tabs -->
+                <div class="grid grid-cols-3 gap-1 bg-zinc-100 dark:bg-zinc-950/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-900">
+                    <button onclick="selectAnalysisTab('trends')" id="tab-trends" class="py-2 text-xs font-medium rounded-lg text-center bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-sm dark:shadow-none transition-all">និន្នាការប្រចាំខែ</button>
+                    <button onclick="selectAnalysisTab('vs')" id="tab-vs" class="py-2 text-xs font-medium rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-center transition-all">ធៀបនឹងថវិកា</button>
+                    <button onclick="selectAnalysisTab('rate')" id="tab-rate" class="py-2 text-xs font-medium rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-center transition-all">អត្រាចំណាយ</button>
+                </div>
+
+                <div class="bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl p-5 space-y-4">
+                    <h3 id="analysis-chart-title" class="text-zinc-900 dark:text-white text-base font-semibold">និន្នាការចំណាយប្រចាំខែ</h3>
+                    
+                    <!-- Line/Bar Chart Area -->
+                    <div class="relative h-48 w-full border-b border-l border-zinc-200 dark:border-zinc-800/80 pt-4 px-2" id="analysis-chart-container">
+                        <!-- Y-axis Guidelines & Labels -->
+                        <div class="absolute right-0 top-4 text-[10px] text-zinc-400 dark:text-zinc-600">១០ម៉ឺន</div>
+                        <div class="absolute right-0 top-24 text-[10px] text-zinc-400 dark:text-zinc-600">៥ម៉ឺន</div>
+                        <div class="absolute right-0 bottom-1 text-[10px] text-zinc-400 dark:text-zinc-600">០</div>
+                        
+                        <div class="absolute left-0 right-0 top-4 border-t border-zinc-200 dark:border-zinc-900/50 border-dashed w-full"></div>
+                        <div class="absolute left-0 right-0 top-24 border-t border-zinc-200 dark:border-zinc-900/50 border-dashed w-full"></div>
+
+                        <!-- Dynamic SVG Line Chart -->
+                        <svg class="w-full h-full" viewBox="0 0 300 150" preserveAspectRatio="none" id="analysis-svg-element">
+                            <defs>
+                                <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.4" />
+                                    <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Gradient Area -->
+                            <path d="M 0 150 L 50 150 L 100 150 L 150 150 L 200 110 L 250 50 L 300 20 L 300 150 Z" fill="url(#chart-gradient)" id="chart-path-area" class="transition-all duration-500"/>
+                            <!-- Line -->
+                            <path d="M 0 150 L 50 150 L 100 150 L 150 150 L 200 110 L 250 50 L 300 20" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" id="chart-path-line" class="transition-all duration-500"/>
+                        </svg>
+
+                        <!-- X-axis Labels -->
+                        <div class="absolute -bottom-6 left-0 right-0 flex justify-between text-[9px] text-zinc-400 dark:text-zinc-600 px-1">
+                            <span>០៣ ឧសភា</span>
+                            <span>១០ ឧសភា</span>
+                            <span>១៧ ឧសភា</span>
+                            <span>២៤ ឧសភា</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-6 grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-white dark:bg-zinc-900/30 rounded-xl border border-zinc-200 dark:border-zinc-900">
+                            <span class="text-xs text-zinc-500 block">ចំណាយសរុប</span>
+                            <span id="analysis-total-spent" class="text-base font-bold text-zinc-900 dark:text-white">៛ ០</span>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-zinc-900/30 rounded-xl border border-zinc-200 dark:border-zinc-900">
+                            <span class="text-xs text-zinc-500 block">មធ្យមភាគប្រចាំថ្ងៃ</span>
+                            <span id="analysis-daily-avg" class="text-base font-bold text-zinc-900 dark:text-white">៛ ០</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. SETTINGS PAGE -->
+            <section id="page-settings" class="space-y-6 py-2 hidden">
+                <!-- Profile Card Placeholder -->
+                <div class="flex items-center gap-4 bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 p-4 rounded-2xl">
+                    <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-sky-400 flex items-center justify-center text-xl font-bold">
+                        គ
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-zinc-900 dark:text-white">គណនីរបស់ខ្ញុំ</h4>
+                        <span class="text-xs text-zinc-500">អ្នកប្រើប្រាស់ឧបករណ៍នេះ</span>
+                    </div>
+                </div>
+
+                <!-- Settings Forms -->
+                <div class="space-y-4">
+                    <h3 class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">ការកំណត់ថវិកា</h3>
+                    <div class="bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 p-4 rounded-2xl space-y-4">
+                        <div>
+                            <label class="block text-xs text-zinc-500 mb-2">កញ្ចប់ថវិកាប្រចាំខែ (៛)</label>
+                            <input type="number" id="setting-budget-input" value="400000" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500">
+                        </div>
+                        <button onclick="saveBudgetSetting()" class="w-full py-3 rounded-xl bg-emerald-500 dark:bg-emerald-500 text-white dark:text-black font-semibold hover:bg-emerald-600 dark:hover:bg-emerald-400 transition-colors text-sm">រក្សាទុកការកំណត់</button>
+                    </div>
+                </div>
+
+                <!-- Appearance Preference -->
+                <div class="space-y-4">
+                    <h3 class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">រូបរាង និងពណ៌គំនូស</h3>
+                    <div class="bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 p-4 rounded-2xl flex items-center justify-between">
+                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">ពណ៌ផ្ទៃភ្លឺ (Light Mode)</span>
+                        <button onclick="toggleTheme()" class="px-4 py-2 rounded-xl bg-zinc-200 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-800 transition-colors">
+                            <span id="theme-btn-text">ប្តូរទៅ Dark Mode</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">ទិន្នន័យ & កម្មវិធី</h3>
+                    <div class="bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl divide-y divide-zinc-200 dark:divide-zinc-900 overflow-hidden">
+                        <button onclick="clearAllData()" class="w-full p-4 flex justify-between items-center hover:bg-zinc-200/50 dark:hover:bg-zinc-900/30 text-left transition-colors text-sm text-red-500 font-medium">
+                            <span>លុបទិន្នន័យទាំងអស់ចោល</span>
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <button onclick="resetToDemoData()" class="w-full p-4 flex justify-between items-center hover:bg-zinc-200/50 dark:hover:bg-zinc-900/30 text-left transition-colors text-sm text-amber-600 dark:text-amber-500 font-medium">
+                            <span>កំណត់ទិន្នន័យគំរូឡើងវិញ</span>
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <div class="p-4 flex justify-between items-center text-sm text-zinc-500">
+                            <span>ស្ថានភាពផ្ទុក</span>
+                            <span class="text-emerald-600 dark:text-emerald-500 font-medium">រក្សាទុកក្នុងម៉ាស៊ីន (Local Storage)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER NAVIGATION -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-black/95 border-t border-zinc-250/80 dark:border-zinc-900/90 grid grid-cols-5 py-2 px-1 z-40 backdrop-blur-md">
+            <button onclick="navigate('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 text-emerald-600 dark:text-sky-500 transition-colors">
+                <i class="fa-solid fa-chart-simple text-lg"></i>
+                <span class="text-[10px] font-medium">ទំព័រដើម</span>
+            </button>
+            <button onclick="navigate('transactions')" id="nav-transactions" class="flex flex-col items-center justify-center gap-1 text-zinc-550 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-list-ul text-lg"></i>
+                <span class="text-[10px] font-medium">Explicit ប្រតិបត្តិការ</span>
+            </button>
+            <button onclick="navigate('categories')" id="nav-categories" class="flex flex-col items-center justify-center gap-1 text-zinc-550 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-folder text-lg"></i>
+                <span class="text-[10px] font-medium">ប្រភេទ</span>
+            </button>
+            <button onclick="navigate('analysis')" id="nav-analysis" class="flex flex-col items-center justify-center gap-1 text-zinc-550 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="text-[10px] font-medium">ការវិភាគ</span>
+            </button>
+            <button onclick="navigate('settings')" id="nav-settings" class="flex flex-col items-center justify-center gap-1 text-zinc-550 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-gear text-lg"></i>
+                <span class="text-[10px] font-medium">ការកំណត់</span>
+            </button>
+        </nav>
+
+        <!-- ADD / EDIT TRANSACTION MODAL -->
+        <div id="add-tx-modal" class="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center hidden opacity-0 transition-opacity duration-300">
+            <!-- Modal Body -->
+            <div class="bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-900 rounded-t-3xl w-full max-w-md p-6 space-y-5 transform translate-y-full transition-transform duration-300">
+                <div class="flex justify-between items-center">
+                    <h3 id="modal-title" class="text-lg font-bold text-zinc-900 dark:text-white">បន្ថែមប្រតិបត្តិការថ្មី</h3>
+                    <button onclick="closeAddTransactionModal()" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+
+                <!-- Transaction Type Toggle -->
+                <div class="grid grid-cols-2 gap-1 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl">
+                    <button type="button" onclick="setModalTxType('expense')" id="btn-modal-expense" class="py-2.5 text-sm font-semibold rounded-lg text-center bg-white dark:bg-zinc-950 text-red-500 shadow-sm dark:shadow-none">ចំណាយ</button>
+                    <button type="button" onclick="setModalTxType('income')" id="btn-modal-income" class="py-2.5 text-sm font-semibold rounded-lg text-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white">ចំណូល</button>
+                </div>
+
+                <!-- Input Fields -->
+                <div class="space-y-4">
+                    <!-- Hidden field to keep track of edit transaction ID -->
+                    <input type="hidden" id="input-tx-id" value="">
+
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">ចំនួនទឹកប្រាក់ (៛)</label>
+                        <input type="number" id="input-tx-amount" placeholder="0" class="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500 font-semibold text-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">ឈ្មោះប្រតិបត្តិការ</label>
+                        <input type="text" id="input-tx-title" placeholder="ឧ. ទិញសម្ភារៈសិក្សា" class="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500 text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">ប្រភេទ</label>
+                        <select id="input-tx-category" class="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500 text-sm">
+                            <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                            <option value="លំនៅដ្ឋាន">លំនៅដ្ឋាន</option>
+                            <option value="សេវាប្រើប្រាស់">សេវាប្រើប្រាស់</option>
+                            <option value="អាហារ & ភេសជ្ជៈ">អាហារ & ភេសជ្ជៈ</option>
+                            <option value="ការធ្វើដំណើរ">ការធ្វើដំណើរ</option>
+                            <option value="ការកម្សាន្ត">ការកម្សាន្ត</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">កាលបរិច្ឆេទ</label>
+                        <input type="date" id="input-tx-date" class="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 dark:focus:border-sky-500 text-sm">
+                    </div>
+                </div>
+
+                <button onclick="saveTransaction()" class="w-full py-3.5 bg-emerald-500 text-white dark:text-black font-semibold rounded-xl text-sm hover:bg-emerald-600 dark:hover:bg-emerald-400 transition-colors">រក្សាទុក</button>
+            </div>
+        </div>
+
+        <!-- ✨ AI ANALYSIS DIALOG MODAL -->
+        <div id="ai-modal" class="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 transition-opacity duration-300 opacity-0">
+            <div class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl flex flex-col max-h-[85vh] transform scale-95 transition-transform duration-300">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">✨</span>
+                        <h3 class="text-base font-bold text-zinc-900 dark:text-white">ការវិភាគហិរញ្ញវត្ថុ AI</h3>
+                    </div>
+                    <button onclick="closeAIModal()" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                
+                <!-- Content Area -->
+                <div id="ai-content-box" class="flex-1 overflow-y-auto no-scrollbar py-2 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                    <!-- Dynamic loader or text advice content from Gemini -->
+                    <div class="flex flex-col items-center justify-center py-12 space-y-3">
+                        <div class="w-8 h-8 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                        <span class="text-xs text-zinc-500 dark:text-zinc-400">កំពុងវិភាគទិន្នន័យថវិកាជាមួយ AI...</span>
+                    </div>
+                </div>
+
+                <!-- Footer button -->
+                <button onclick="closeAIModal()" class="w-full py-3 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs transition-colors">
+                    យល់ព្រម
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Message Box (Alternative to Browser Alerts) -->
+        <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50 pointer-events-none opacity-0 transition-opacity duration-300">
+            <span id="toast-icon" class="text-emerald-500"><i class="fa-solid fa-circle-check"></i></span>
+            <span id="toast-message" class="text-sm font-medium">ជោគជ័យ!</span>
+        </div>
+
+    </div>
+
+    <!-- JavaScript App Logic -->
+    <script>
+        // Default App State
+        let state = {
+            totalBudget: 400000, // 400,000 KHR default
+            transactions: [
+                { id: '1', title: 'ស្ករីង', amount: -6000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '2', title: 'ទិញប៊ុកល្ហុង', amount: -6000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '3', title: 'ចាញ់បាល់', amount: -8000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '4', title: 'ទិញអីវ៉ាន់', amount: -20000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' }
+            ],
+            categoryIcons: {
+                'ផ្សេងៗ': { icon: 'fa-ellipsis', bg: 'bg-zinc-200 dark:bg-zinc-800', color: '#71717a' },
+                'លំនៅដ្ឋាន': { icon: 'fa-house', bg: 'bg-blue-500/10', color: '#3b82f6' },
+                'សេវាប្រើប្រាស់': { icon: 'fa-bolt', bg: 'bg-yellow-500/10', color: '#eab308' },
+                'អាហារ & ភេសជ្ជៈ': { icon: 'fa-utensils', bg: 'bg-orange-500/10', color: '#f97316' },
+                'ការធ្វើដំណើរ': { icon: 'fa-car', bg: 'bg-purple-500/10', color: '#a855f7' },
+                'ការកម្សាន្ត': { icon: 'fa-gamepad', bg: 'bg-pink-500/10', color: '#ec4899' }
+            },
+            currentTab: 'dashboard',
+            modalTxType: 'expense',
+            filters: {
+                search: '',
+                type: 'all'
+            },
+            analysisTab: 'trends'
+        };
+
+        // Storage keys
+        const STORAGE_KEY_BUDGET = 'khmer_budget_total';
+        const STORAGE_KEY_TXS = 'khmer_budget_txs';
+        const STORAGE_KEY_THEME = 'khmer_budget_theme';
+
+        // Load theme from storage
+        function loadTheme() {
+            const storedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'light';
+            document.documentElement.className = storedTheme;
+            updateThemeUI(storedTheme);
+        }
+
+        // Toggle and Save Theme
+        function toggleTheme() {
+            const currentTheme = document.documentElement.className;
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.className = newTheme;
+            localStorage.setItem(STORAGE_KEY_THEME, newTheme);
+            updateThemeUI(newTheme);
+            showToast(newTheme === 'dark' ? 'ប្តូរទៅមុខងារងងឹត (Dark Mode)' : 'ប្តូរទៅមុខងារភ្លឺ (Light Mode)', 'success');
+        }
+
+        // Update Theme Icons & Buttons UI
+        function updateThemeUI(theme) {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeBtnText = document.getElementById('theme-btn-text');
+            if (theme === 'dark') {
+                themeIcon.className = "fa-solid fa-moon text-lg";
+                themeBtnText.innerText = "ប្តូរទៅ Light Mode";
+            } else {
+                themeIcon.className = "fa-solid fa-sun text-lg";
+                themeBtnText.innerText = "ប្តូរទៅ Dark Mode";
+            }
+        }
+
+        // Load data from Local Storage
+        function loadDataFromStorage() {
+            const storedBudget = localStorage.getItem(STORAGE_KEY_BUDGET);
+            const storedTxs = localStorage.getItem(STORAGE_KEY_TXS);
+
+            if (storedBudget !== null) {
+                state.totalBudget = parseFloat(storedBudget);
+                document.getElementById('setting-budget-input').value = state.totalBudget;
+            }
+
+            if (storedTxs !== null) {
+                try {
+                    state.transactions = JSON.parse(storedTxs);
+                } catch (e) {
+                    console.error("Error parsing stored transactions, using default.", e);
+                }
+            }
+        }
+
+        // Save data to Local Storage
+        function saveDataToStorage() {
+            localStorage.setItem(STORAGE_KEY_BUDGET, state.totalBudget.toString());
+            localStorage.setItem(STORAGE_KEY_TXS, JSON.stringify(state.transactions));
+        }
+
+        // Standard formatting helper for Khmer Riel
+        function formatRiel(amount) {
+            let isNegative = amount < 0;
+            let absVal = Math.abs(amount);
+            let formatted = absVal.toLocaleString('en-US'); // gives commas like 400,000
+            
+            // Convert numbers to Khmer digits for authentic touch
+            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+            let khmerFormatted = formatted.split('').map(char => {
+                if (char >= '0' && char <= '9') {
+                    return khmerDigits[parseInt(char)];
+                }
+                return char;
+            }).join('');
+
+            return (isNegative ? '-៛ ' : '៛ ') + khmerFormatted;
+        }
+
+        // Format Date to Khmer Style
+        function formatKhmerDate(dateString) {
+            const date = new Date(dateString);
+            const months = [
+                'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 
+                'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'
+            ];
+            
+            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+            const convertNum = (num) => num.toString().split('').map(c => khmerDigits[parseInt(c)]).join('');
+            
+            let day = convertNum(date.getDate());
+            let month = months[date.getMonth()];
+            let year = convertNum(date.getFullYear());
+            
+            return `${day} ${month} ${year}`;
+        }
+
+        // Show Custom Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+            if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                toastIcon.className = 'text-emerald-500';
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                toastIcon.className = 'text-red-500';
+            }
+
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // Tab Navigation
+        function navigate(tabId) {
+            state.currentTab = tabId;
+            
+            // Hide all pages
+            document.getElementById('page-dashboard').classList.add('hidden');
+            document.getElementById('page-transactions').classList.add('hidden');
+            document.getElementById('page-categories').classList.add('hidden');
+            document.getElementById('page-analysis').classList.add('hidden');
+            document.getElementById('page-settings').classList.add('hidden');
+
+            // Show active page
+            document.getElementById(`page-${tabId}`).classList.remove('hidden');
+
+            // Set headers and titles dynamically
+            const headerTitle = document.getElementById('page-title');
+            if (tabId === 'dashboard') headerTitle.innerText = 'ផ្ទាំងគ្រប់គ្រង';
+            else if (tabId === 'transactions') headerTitle.innerText = 'ប្រតិបត្តិការ';
+            else if (tabId === 'categories') headerTitle.innerText = 'ប្រភេទចំណាយ';
+            else if (tabId === 'analysis') headerTitle.innerText = 'ការវិភាគចំណាយ';
+            else if (tabId === 'settings') headerTitle.innerText = 'ការកំណត់';
+
+            // Active nav button style
+            const tabs = ['dashboard', 'transactions', 'categories', 'analysis', 'settings'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    btn.className = "flex flex-col items-center justify-center gap-1 text-emerald-600 dark:text-sky-500 transition-colors";
+                } else {
+                    btn.className = "flex flex-col items-center justify-center gap-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors";
+                }
+            });
+
+            // Perform context tasks
+            if (tabId === 'dashboard') renderDashboard();
+            if (tabId === 'transactions') renderTransactions();
+            if (tabId === 'categories') renderCategories();
+            if (tabId === 'analysis') renderAnalysis();
+        }
+
+        // State calculations helper
+        function calculateSummary() {
+            let spent = 0;
+            let income = 0;
+            
+            state.transactions.forEach(tx => {
+                if (tx.type === 'expense') {
+                    spent += Math.abs(tx.amount);
+                } else {
+                    income += tx.amount;
+                }
+            });
+
+            let remaining = state.totalBudget - spent;
+            let progressPercent = state.totalBudget > 0 ? Math.min(100, Math.round((spent / state.totalBudget) * 100)) : 0;
+
+            return { spent, remaining, progressPercent, income };
+        }
+
+        // Render Dashboard screen
+        function renderDashboard() {
+            const summary = calculateSummary();
+
+            // Populate Overview Values
+            document.getElementById('val-total-budget').innerText = formatRiel(state.totalBudget);
+            document.getElementById('val-total-spent').innerText = formatRiel(summary.spent);
+            document.getElementById('val-total-remaining').innerText = formatRiel(summary.remaining);
+            document.getElementById('progress-text').innerText = `${summary.progressPercent}%`;
+
+            // Progress Ring calculation
+            const circle = document.getElementById('progress-circle');
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius; // 251.2
+            const offset = circumference - (summary.progressPercent / 100) * circumference;
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = offset;
+
+            // Render Recent Transactions (limit to 4)
+            const recentList = document.getElementById('dashboard-recent-list');
+            recentList.innerHTML = '';
+
+            const sortedTx = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+
+            if (sortedTx.length === 0) {
+                recentList.innerHTML = `
+                    <div class="text-center py-6 text-zinc-500 text-sm">
+                        មិនទាន់មានប្រតិបត្តិការនៅឡើយទេ
+                    </div>`;
+            } else {
+                sortedTx.forEach(tx => {
+                    const catInfo = state.categoryIcons[tx.category] || state.categoryIcons['ផ្សេងៗ'];
+                    const amountClass = tx.type === 'expense' ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-500';
+                    const sign = tx.type === 'expense' ? '-' : '+';
+                    
+                    recentList.innerHTML += `
+                        <div class="flex items-center justify-between p-3.5 bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-200/80 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
+                                    <i class="fa-solid ${catInfo.icon}"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm text-zinc-900 dark:text-white">${tx.title}</h4>
+                                    <span class="text-xs text-zinc-500">${tx.category}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-sm ${amountClass}">${sign}${formatRiel(Math.abs(tx.amount)).replace('៛ ', '៛')}</span>
+                                <span class="block text-[10px] text-zinc-500 dark:text-zinc-600 mt-0.5">${formatKhmerDate(tx.date)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Render Category Summary Preview
+            const previewContainer = document.getElementById('dashboard-category-preview');
+            previewContainer.innerHTML = '';
+            
+            // Calculate sum per category
+            let catSpent = {};
+            let totalExpense = 0;
+            state.transactions.forEach(tx => {
+                if (tx.type === 'expense') {
+                    const amount = Math.abs(tx.amount);
+                    catSpent[tx.category] = (catSpent[tx.category] || 0) + amount;
+                    totalExpense += amount;
+                }
+            });
+
+            // If empty
+            if (Object.keys(catSpent).length === 0 || totalExpense === 0) {
+                previewContainer.innerHTML = `
+                    <div class="text-center py-2 text-zinc-500 text-xs">
+                        មិនទាន់មានទិន្នន័យចំណាយតាមប្រភេទឡើយ
+                    </div>
+                `;
+            } else {
+                // Sort and display top 1
+                const topCategory = Object.entries(catSpent).sort((a,b) => b[1] - a[1])[0];
+                const catName = topCategory[0];
+                const catValue = topCategory[1];
+                const catPercent = totalExpense > 0 ? Math.round((catValue / totalExpense) * 100) : 0;
+                const catIcon = state.categoryIcons[catName] || state.categoryIcons['ផ្សេងៗ'];
+
+                previewContainer.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-200/80 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
+                                <i class="fa-solid ${catIcon.icon}"></i>
+                            </div>
+                            <span class="font-medium text-sm text-zinc-700 dark:text-zinc-300">${catName}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-sm text-zinc-900 dark:text-white">${formatRiel(catValue)}</span>
+                            <span class="text-xs text-zinc-500 block">(${catPercent}%)</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Render Transaction list & filters
+        function renderTransactions() {
+            const txList = document.getElementById('main-transactions-list');
+            txList.innerHTML = '';
+
+            let filtered = state.transactions.filter(tx => {
+                const matchesSearch = tx.title.toLowerCase().includes(state.filters.search.toLowerCase()) || 
+                                      tx.category.toLowerCase().includes(state.filters.search.toLowerCase());
+                
+                const matchesType = state.filters.type === 'all' || tx.type === state.filters.type;
+                
+                return matchesSearch && matchesType;
+            });
+
+            // Sort by Date Descending
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if (filtered.length === 0) {
+                txList.innerHTML = `
+                    <div class="text-center py-12 text-zinc-500 text-sm">
+                        មិនរកឃើញប្រតិបត្តិការសោះ
+                    </div>`;
+                return;
+            }
+
+            filtered.forEach(tx => {
+                const catInfo = state.categoryIcons[tx.category] || state.categoryIcons['ផ្សេងៗ'];
+                const amountClass = tx.type === 'expense' ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-500';
+                const sign = tx.type === 'expense' ? '-' : '+';
+
+                txList.innerHTML += `
+                    <div class="flex items-center justify-between p-4 bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl hover:border-zinc-300 dark:hover:border-zinc-800 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-200/80 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
+                                <i class="fa-solid ${catInfo.icon}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-zinc-900 dark:text-white">${tx.title}</h4>
+                                <span class="text-xs text-zinc-500">${tx.category}</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-sm ${amountClass}">${sign}${formatRiel(Math.abs(tx.amount)).replace('៛ ', '៛')}</span>
+                                <div class="flex items-center gap-0.5 ml-1">
+                                    <!-- Edit Button -->
+                                    <button onclick="openEditTransactionModal('${tx.id}')" class="text-zinc-500 hover:text-emerald-600 dark:hover:text-sky-400 text-xs p-1.5 transition-colors" title="កែសម្រួល"><i class="fa-solid fa-pen text-[11px]"></i></button>
+                                    <!-- Delete Button -->
+                                    <button onclick="deleteTransaction('${tx.id}')" class="text-zinc-400 hover:text-red-500 text-xs p-1.5 transition-colors" title="លុប"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-600 mt-1">${formatKhmerDate(tx.date)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterTransactions() {
+            state.filters.search = document.getElementById('tx-search').value;
+            renderTransactions();
+        }
+
+        function filterType(type) {
+            state.filters.type = type;
+            
+            // Set styles of chips
+            const types = ['all', 'expense', 'income'];
+            types.forEach(t => {
+                const btn = document.getElementById(`chip-${t}`);
+                if (t === type) {
+                    btn.className = "px-4 py-2 rounded-full text-xs font-medium bg-zinc-900 dark:bg-white text-white dark:text-black transition-colors shrink-0";
+                } else {
+                    btn.className = "px-4 py-2 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors shrink-0";
+                }
+            });
+
+            renderTransactions();
+        }
+
+        // Delete Transaction
+        function deleteTransaction(id) {
+            state.transactions = state.transactions.filter(tx => tx.id !== id);
+            
+            // Save to Local Storage
+            saveDataToStorage();
+            
+            showToast('លុបប្រតិបត្តិការបានជោគជ័យ!', 'success');
+            
+            // Update UI based on current view
+            if (state.currentTab === 'dashboard') renderDashboard();
+            else if (state.currentTab === 'transactions') renderTransactions();
+            else if (state.currentTab === 'categories') renderCategories();
+        }
+
+        // Render Categories with SVG Doughnut Chart
+        function renderCategories() {
+            const detailList = document.getElementById('categories-detail-list');
+            detailList.innerHTML = '';
+
+            let catSpent = {};
+            let totalSpent = 0;
+
+            // Initialize all categories with 0
+            Object.keys(state.categoryIcons).forEach(cat => {
+                catSpent[cat] = 0;
+            });
+
+            // Tally values
+            state.transactions.forEach(tx => {
+                if (tx.type === 'expense') {
+                    const amt = Math.abs(tx.amount);
+                    catSpent[tx.category] = (catSpent[tx.category] || 0) + amt;
+                    totalSpent += amt;
+                }
+            });
+
+            document.getElementById('chart-center-spent').innerText = formatRiel(totalSpent).replace('៛ ', '៛');
+
+            // Draw SVG Chart segment paths
+            const svgEl = document.getElementById('categories-chart-svg');
+            // Remove existing segments
+            const oldPaths = svgEl.querySelectorAll('.chart-segment');
+            oldPaths.forEach(p => p.remove());
+
+            // Build categorized layout sorted by spending desc
+            const sortedCategories = Object.entries(catSpent).sort((a,b) => b[1] - a[1]);
+            
+            let accumulatedPercent = 0;
+            
+            sortedCategories.forEach(([cat, val]) => {
+                const pct = totalSpent > 0 ? (val / totalSpent) : 0;
+                const catInfo = state.categoryIcons[cat] || state.categoryIcons['ផ្សេងៗ'];
+                const pctRounded = Math.round(pct * 100);
+
+                // Add to SVG segments
+                if (pct > 0) {
+                    const radius = 38;
+                    const circumference = 2 * Math.PI * radius; // 238.76
+                    const strokeDashoffset = circumference - (pct * circumference);
+                    const strokeDasharray = `${circumference} ${circumference}`;
+                    const rotation = (accumulatedPercent * 360) - 90;
+
+                    const segmentCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    segmentCircle.setAttribute("cx", "50");
+                    segmentCircle.setAttribute("cy", "50");
+                    segmentCircle.setAttribute("r", radius);
+                    segmentCircle.setAttribute("stroke", catInfo.color);
+                    segmentCircle.setAttribute("stroke-width", "12");
+                    segmentCircle.setAttribute("fill", "transparent");
+                    segmentCircle.setAttribute("stroke-dasharray", strokeDasharray);
+                    segmentCircle.setAttribute("stroke-dashoffset", strokeDashoffset);
+                    segmentCircle.setAttribute("transform", `rotate(${rotation} 50 50)`);
+                    segmentCircle.setAttribute("class", "chart-segment transition-all duration-700 ease-out");
+                    svgEl.appendChild(segmentCircle);
+
+                    accumulatedPercent += pct;
+                }
+
+                // Append Category List item
+                detailList.innerHTML += `
+                    <div class="flex items-center justify-between p-3.5 bg-zinc-100/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-900 rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-200/80 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
+                                <i class="fa-solid ${catInfo.icon}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-zinc-900 dark:text-white">${cat}</h4>
+                                <span class="text-[10px] text-zinc-500 font-medium uppercase tracking-wider block">ចំណាយ</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-sm text-zinc-900 dark:text-white">${formatRiel(val)}</span>
+                            <span class="text-xs text-zinc-500 block">(${pctRounded}%)</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Render Analysis Page
+        function selectAnalysisTab(tab) {
+            state.analysisTab = tab;
+            
+            const tabs = ['trends', 'vs', 'rate'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    btn.className = "py-2 text-xs font-medium rounded-lg text-center bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-sm dark:shadow-none transition-all";
+                } else {
+                    btn.className = "py-2 text-xs font-medium rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-center transition-all";
+                }
+            });
+
+            renderAnalysis();
+        }
+
+        function renderAnalysis() {
+            const titleEl = document.getElementById('analysis-chart-title');
+            const totalSpentEl = document.getElementById('analysis-total-spent');
+            const avgEl = document.getElementById('analysis-daily-avg');
+            const summary = calculateSummary();
+
+            totalSpentEl.innerText = formatRiel(summary.spent);
+            
+            // Calculate daily average (assuming current month up to today)
+            const today = new Date();
+            const daysPassed = today.getDate() || 1;
+            const dailyAvg = Math.round(summary.spent / daysPassed);
+            avgEl.innerText = formatRiel(dailyAvg);
+
+            // Change chart paths depending on selected view
+            const pathLine = document.getElementById('chart-path-line');
+            const pathArea = document.getElementById('chart-path-area');
+
+            if (state.analysisTab === 'trends') {
+                titleEl.innerText = "និន្នាការចំណាយប្រចាំខែ (ឧសភា)";
+                pathLine.setAttribute('d', 'M 0 145 L 50 140 L 100 135 L 150 130 L 200 100 L 250 60 L 300 30');
+                pathArea.setAttribute('d', 'M 0 150 L 0 145 L 50 140 L 100 135 L 150 130 L 200 100 L 250 60 L 300 30 L 300 150 Z');
+            } else if (state.analysisTab === 'vs') {
+                titleEl.innerText = "ថវិកាប្រៀបធៀបនឹងការចំណាយជាក់ស្តែង";
+                pathLine.setAttribute('d', 'M 0 60 L 300 60');
+                pathArea.setAttribute('d', 'M 0 150 L 0 60 L 300 60 L 300 150 Z');
+            } else if (state.analysisTab === 'rate') {
+                titleEl.innerText = "អត្រាល្បឿននៃការចំណាយប្រចាំថ្ងៃ";
+                pathLine.setAttribute('d', 'M 0 135 L 50 115 L 100 100 L 150 120 L 200 125 L 250 75 L 300 90');
+                pathArea.setAttribute('d', 'M 0 150 L 0 135 L 50 115 L 100 100 L 150 120 L 200 125 L 250 75 L 300 90 L 300 150 Z');
+            }
+        }
+
+        // Add / Edit Transaction Modal Functionality
+        function openAddTransactionModal() {
+            // Reset fields for fresh addition
+            document.getElementById('input-tx-id').value = '';
+            document.getElementById('input-tx-amount').value = '';
+            document.getElementById('input-tx-title').value = '';
+            document.getElementById('input-tx-category').selectedIndex = 0;
+            
+            document.getElementById('modal-title').innerText = "បន្ថែមប្រតិបត្តិការថ្មី";
+            setModalTxType('expense');
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('input-tx-date').value = todayStr;
+
+            showModal();
+        }
+
+        function openEditTransactionModal(id) {
+            const tx = state.transactions.find(t => t.id === id);
+            if (!tx) return;
+
+            // Fill input values with target transaction's data
+            document.getElementById('input-tx-id').value = tx.id;
+            document.getElementById('input-tx-amount').value = Math.abs(tx.amount);
+            document.getElementById('input-tx-title').value = tx.title;
+            document.getElementById('input-tx-category').value = tx.category;
+            document.getElementById('input-tx-date').value = tx.date;
+
+            document.getElementById('modal-title').innerText = "កែសម្រួលប្រតិបត្តិការ";
+            setModalTxType(tx.type);
+
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('add-tx-modal');
+            const modalBody = modal.querySelector('div');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalBody.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeAddTransactionModal() {
+            const modal = document.getElementById('add-tx-modal');
+            const modalBody = modal.querySelector('div');
+
+            modal.classList.add('opacity-0');
+            modalBody.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function setModalTxType(type) {
+            state.modalTxType = type;
+            const btnExpense = document.getElementById('btn-modal-expense');
+            const btnIncome = document.getElementById('btn-modal-income');
+
+            if (type === 'expense') {
+                btnExpense.className = "py-2.5 text-sm font-semibold rounded-lg text-center bg-white dark:bg-zinc-950 text-red-500 shadow-sm dark:shadow-none";
+                btnIncome.className = "py-2.5 text-sm font-semibold rounded-lg text-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white";
+            } else {
+                btnExpense.className = "py-2.5 text-sm font-semibold rounded-lg text-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white";
+                btnIncome.className = "py-2.5 text-sm font-semibold rounded-lg text-center bg-white dark:bg-zinc-950 text-emerald-650 dark:text-emerald-500 shadow-sm dark:shadow-none";
+            }
+        }
+
+        // Save (Insert or Update) Transaction
+        function saveTransaction() {
+            const txId = document.getElementById('input-tx-id').value;
+            const amtVal = parseFloat(document.getElementById('input-tx-amount').value);
+            const titleVal = document.getElementById('input-tx-title').value.trim();
+            const categoryVal = document.getElementById('input-tx-category').value;
+            const dateVal = document.getElementById('input-tx-date').value;
+
+            if (isNaN(amtVal) || amtVal <= 0) {
+                showToast('សូមបញ្ចូលចំនួនទឹកប្រាក់ឲ្យបានត្រឹមត្រូវ!', 'error');
+                return;
+            }
+
+            if (!titleVal) {
+                showToast('សូមបញ្ចូលឈ្មោះប្រតិបត្តិការ!', 'error');
+                return;
+            }
+
+            const signedAmount = state.modalTxType === 'expense' ? -amtVal : amtVal;
+            const finalDate = dateVal || new Date().toISOString().split('T')[0];
+
+            if (txId) {
+                // Update existing transaction
+                const index = state.transactions.findIndex(t => t.id === txId);
+                if (index !== -1) {
+                    state.transactions[index] = {
+                        ...state.transactions[index],
+                        title: titleVal,
+                        amount: signedAmount,
+                        category: categoryVal,
+                        date: finalDate,
+                        type: state.modalTxType
+                    };
+                    showToast('កែសម្រួលប្រតិបត្តិការជោគជ័យ!', 'success');
+                }
+            } else {
+                // Create new transaction
+                const newTx = {
+                    id: Date.now().toString(),
+                    title: titleVal,
+                    amount: signedAmount,
+                    category: categoryVal,
+                    date: finalDate,
+                    type: state.modalTxType
+                };
+                state.transactions.unshift(newTx);
+                showToast('បន្ថែមប្រតិបត្តិការថ្មីបានជោគជ័យ!', 'success');
+            }
+            
+            // Save dynamically to storage
+            saveDataToStorage();
+            closeAddTransactionModal();
+            
+            // Refresh views
+            if (state.currentTab === 'dashboard') renderDashboard();
+            else if (state.currentTab === 'transactions') renderTransactions();
+            else if (state.currentTab === 'categories') renderCategories();
+        }
+
+        // Save Budget Settings
+        function saveBudgetSetting() {
+            const budgetInp = parseFloat(document.getElementById('setting-budget-input').value);
+            if (isNaN(budgetInp) || budgetInp <= 0) {
+                showToast('សូមបញ្ចូលថវិកាសរុបត្រឹមត្រូវ!', 'error');
+                return;
+            }
+
+            state.totalBudget = budgetInp;
+            
+            // Save to Local Storage
+            saveDataToStorage();
+
+            showToast('រក្សាទុកការកំណត់ថវិកាបានជោគជ័យ!', 'success');
+            renderDashboard();
+        }
+
+        // Reset to default demo data
+        function resetToDemoData() {
+            state.totalBudget = 400000;
+            state.transactions = [
+                { id: '1', title: 'ស្ករីង', amount: -6000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '2', title: 'ទិញប៊ុកល្ហុង', amount: -6000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '3', title: 'ចាញ់បាល់', amount: -8000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' },
+                { id: '4', title: 'ទិញអីវ៉ាន់', amount: -20000, category: 'ផ្សេងៗ', date: '2026-05-29', type: 'expense' }
+            ];
+            document.getElementById('setting-budget-input').value = 400000;
+            
+            saveDataToStorage();
+            
+            showToast('បានកំណត់ទិន្នន័យគំរូឡើងវិញជោគជ័យ!', 'success');
+            if (state.currentTab === 'settings') navigate('dashboard');
+            else renderDashboard();
+        }
+
+        // Delete/Clear all data
+        function clearAllData() {
+            state.totalBudget = 0;
+            state.transactions = [];
+            document.getElementById('setting-budget-input').value = 0;
+
+            saveDataToStorage();
+
+            showToast('បានលុបទិន្នន័យទាំងអស់រួចរាល់!', 'success');
+            if (state.currentTab === 'settings') navigate('dashboard');
+            else renderDashboard();
+        }
+
+        // ==========================================
+        // ✨ GEMINI API INTEGRATION & RETRY SYSTEM ✨
+        // ==========================================
+        const apiKey = ""; // Runtime override allowed by system
+
+        // Open AI Dialog Modal
+        function openAIModal() {
+            const modal = document.getElementById('ai-modal');
+            const modalBody = modal.querySelector('div');
+
+            // Set loading state by default
+            document.getElementById('ai-content-box').innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 space-y-3">
+                    <div class="w-8 h-8 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">កំពុងវិភាគទិន្នន័យថវិកាជាមួយ AI...</span>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                modalBody.classList.remove('scale-95');
+                modalBody.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeAIModal() {
+            const modal = document.getElementById('ai-modal');
+            const modalBody = modal.querySelector('div');
+
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            modalBody.classList.remove('scale-100');
+            modalBody.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Simple markdown formatter helper to styling AI Output
+        function formatMarkdownToHtml(text) {
+            if (!text) return "";
+            let html = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            // Bold styling: **text** -> <strong>text</strong>
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="text-zinc-900 dark:text-white font-bold">$1</strong>');
+            
+            // Bullet points: * text -> <li>text</li>
+            html = html.replace(/^\*\s(.*)$/gm, '<li class="ml-4 list-disc mb-1">$1</li>');
+            
+            // Group lists
+            html = html.replace(/(<li class="ml-4 list-disc mb-1">.*<\/li>)/gs, '<ul class="my-2 space-y-1">$1<\/ul>');
+
+            // Line breaks
+            html = html.split('\n').join('<br>');
+
+            return html;
+        }
+
+        // Call Gemini Model with Exponential Backoff
+        async function fetchGeminiAdvice(systemPrompt, userQuery) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            let delay = 1000; // start with 1s
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    }
+                } catch (err) {
+                    // Fail silently, proceed to retry
+                }
+                
+                // Wait with backoff
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Double delay: 1s, 2s, 4s, 8s, 16s
+            }
+            throw new Error("ការតភ្ជាប់ទៅកាន់ AI បានបរាជ័យ។ សូមពិនិត្យមើលប្រព័ន្ធអុីនធឺណិតរបស់អ្នក រួចព្យាយាមម្តងទៀត។");
+        }
+
+        // Main AI Trigger
+        async function askAIFeedback() {
+            openAIModal();
+            const summary = calculateSummary();
+
+            const systemPrompt = "You are a professional and encouraging Cambodian AI Financial Advisor. Your job is to analyze the user's monthly budget and expenses. Deliver a concise, helpful summary of their current spending in Cambodian Khmer. Outline where they are doing well and where they can cut back. List exactly 3 highly actionable, smart budget saving recommendations formatted with bullet points, using emojis. Use currency representations in Cambodian Riel (៛). Keep the entire output under 180 words, highly professional, encouraging, and clear. Do not refer to English concepts unless necessary. Always format important metrics in bold.";
+
+            // Construct contextual query from user budget data
+            const userQuery = `
+            ស្ថានភាពថវិកាបច្ចុប្បន្ន៖
+            - កញ្ចប់ថវិកាសរុប: ${summary.spent + summary.remaining} ៛
+            - ប្រើអស់ទៅលើការចំណាយ: ${summary.spent} ៛
+            - ថវិកានៅសល់ជាក់ស្តែង: ${summary.remaining} ៛
+            - ភាគរយប្រើអស់: ${summary.progressPercent}%
+
+            បញ្ជីប្រតិបត្តិការចំណាយ៖
+            ${state.transactions.map(t => `- ${t.title}: ទឹកប្រាក់ ${Math.abs(t.amount)} ៛ (ប្រភេទ: ${t.category}, កាលបរិច្ឆេទ: ${t.date})`).join('\n')}
+            `;
+
+            try {
+                const aiResult = await fetchGeminiAdvice(systemPrompt, userQuery);
+                if (aiResult) {
+                    const cleanHtml = formatMarkdownToHtml(aiResult);
+                    document.getElementById('ai-content-box').innerHTML = `
+                        <div class="space-y-3 animation-fade">
+                            <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-2">✨ ទីប្រឹក្សា AI របស់អ្នកបានវិភាគរួចរាល់៖</p>
+                            <div class="text-zinc-800 dark:text-zinc-300 space-y-2">${cleanHtml}</div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                document.getElementById('ai-content-box').innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center space-y-4">
+                        <span class="text-3xl text-red-500">⚠️</span>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-zinc-900 dark:text-white text-sm">មិនអាចទាញយកការណែនាំបានទេ</h4>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs px-4">មានបញ្ហាក្នុងការតភ្ជាប់ជាមួយ Gemini AI។ សូមប្រាកដថាអ្នកមានអុីនធឺណិត ឬសាកល្បងម្តងទៀតនៅពេលក្រោយ។</p>
+                        </div>
+                        <button onclick="askAIFeedback()" class="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-semibold hover:bg-emerald-600 transition-colors">
+                            ព្យាយាមម្តងទៀត
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize App on Window load
+        window.onload = function() {
+            loadTheme();
+            loadDataFromStorage();
+            renderDashboard();
+        }
+    </script>
+</body>
+</html>
